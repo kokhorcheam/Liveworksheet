@@ -1,0 +1,53 @@
+// worksheet.html logic (placed inside your <script> tag)
+
+window.onload = function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const mode = urlParams.get('mode');
+  
+  if (mode === 'review') {
+    enableReviewMode();
+  }
+};
+
+function enableReviewMode() {
+  // 1. Hide the submit button
+  document.getElementById('submitBtn').style.display = 'none';
+  
+  // 2. Retrieve the saved answers from the dashboard click
+  const savedAnswers = JSON.parse(sessionStorage.getItem('reviewData'));
+  
+  // 3. Loop through saved answers and inject them into the inputs
+  for (const [inputId, answerValue] of Object.entries(savedAnswers)) {
+    const inputElement = document.getElementById(inputId);
+    if (inputElement) {
+      inputElement.value = answerValue;
+      inputElement.disabled = true; // Lock the field
+      
+      // Optional: Add styling to show it's locked
+      inputElement.classList.add('bg-gray-200', 'cursor-not-allowed');
+    }
+  }
+  
+  // 4. Show a banner indicating review mode
+  document.getElementById('headerStatus').innerText = "Review Mode (Read Only)";
+}
+
+async function submitWorksheet() {
+  // Standard grading logic goes here...
+  // Gather answers into an object: { "q1": "their answer", "q2": "their answer" }
+  
+  const payload = {
+    studentId: localStorage.getItem('activeStudentId'),
+    worksheetId: new URLSearchParams(window.location.search).get('id'),
+    score: calculatedScore,
+    answers: gatheredAnswersObject 
+  };
+
+  await fetch('YOUR_APPS_SCRIPT_URL_HERE', {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(payload)
+  });
+  
+  window.location.href = 'dashboard.html'; // Send back to hub after submitting
+}
