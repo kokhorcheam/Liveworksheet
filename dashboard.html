@@ -1,34 +1,116 @@
-<!-- dashboard.html -->
-<script>
-  const scriptUrl = 'https://script.google.com/macros/s/AKfycbzlNJ6ZG3EsE5ywCl9qd3b4reBOKupPSxuDxoiQvx1oUdFdalQhBi6wisJyEI6l1mlo/exec';
-  const studentId = localStorage.getItem('activeStudentId');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AHL Student Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style> body { font-family: 'Inter', sans-serif; } </style>
+</head>
+<body class="bg-gray-50 text-gray-800 p-8">
+  <div class="max-w-4xl mx-auto">
+    <div id="loginSection" class="bg-white p-8 rounded shadow-md max-w-md mx-auto mt-20">
+      <h1 class="text-2xl font-bold mb-4">Student Login</h1>
+      <input type="text" id="studentIdInput" placeholder="Enter Student ID" class="border border-gray-300 p-3 w-full rounded mb-4">
+      <button onclick="login()" class="bg-blue-600 text-white p-3 w-full rounded hover:bg-blue-700 font-semibold">Access Portal</button>
+    </div>
 
-  if (!studentId) window.location.href = 'index.html'; // Kick out if not logged in
+    <div id="dashboardSection" class="hidden">
+      <header class="flex justify-between items-center mb-8 border-b pb-4">
+        <h1 class="text-3xl font-bold" id="welcomeMessage">Dashboard</h1>
+        <button onclick="logout()" class="text-red-600 hover:underline">Logout</button>
+      </header>
 
-  async function loadHistory() {
-    document.getElementById('welcome').innerText = `Welcome, Student ${studentId}`;
-    
-    // Fetch data from Apps Script doGet()
-    const response = await fetch(`${scriptUrl}?studentId=${studentId}`);
-    const history = await response.json();
-    
-    const tableBody = document.getElementById('historyTable');
-    history.forEach(record => {
-      // Store the raw answers temporarily in sessionStorage for the review mode to pick up
-      const reviewPayload = encodeURIComponent(JSON.stringify(record.answers));
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="bg-white p-6 rounded shadow-sm">
+          <h2 class="text-xl font-semibold mb-4">Active Modules</h2>
+          <ul class="space-y-2">
+            <li><a href="week6_job_duties.html" class="text-blue-600 hover:underline flex items-center">→ Week 6: Describing Job Duties</a></li>
+          </ul>
+        </div>
+
+        <div class="bg-white p-6 rounded shadow-sm">
+          <h2 class="text-xl font-semibold mb-4">Submission History</h2>
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-gray-100">
+                <th class="p-2 border-b">Module</th>
+                <th class="p-2 border-b">Score</th>
+                <th class="p-2 border-b">Action</th>
+              </tr>
+            </thead>
+            <tbody id="historyTableBody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzlNJ6ZG3EsE5ywCl9qd3b4reBOKupPSxuDxoiQvx1oUdFdalQhBi6wisJyEI6l1mlo/exec';
+
+    function checkAuth() {
+      const studentId = localStorage.getItem('activeStudentId');
+      if (studentId) {
+        document.getElementById('loginSection').classList.add('hidden');
+        document.getElementById('dashboardSection').classList.remove('hidden');
+        document.getElementById('welcomeMessage').innerText = `Welcome, ID: ${studentId}`;
+        loadHistory(studentId);
+      } else {
+        document.getElementById('loginSection').classList.remove('hidden');
+        document.getElementById('dashboardSection').classList.add('hidden');
+      }
+    }
+
+    function login() {
+      const id = document.getElementById('studentIdInput').value.trim();
+      if (id) {
+        localStorage.setItem('activeStudentId', id);
+        checkAuth();
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('activeStudentId');
+      checkAuth();
+    }
+
+    async function loadHistory(studentId) {
+      const tableBody = document.getElementById('historyTableBody');
+      tableBody.innerHTML = '<tr><td colspan="3" class="p-2 text-center text-gray-500">Loading history...</td></tr>';
       
-      tableBody.innerHTML += `
-        <tr>
-          <td class="p-2 border">${record.worksheetId}</td>
-          <td class="p-2 border">${record.score}</td>
-          <td class="p-2 border">
-            <a href="worksheet.html?id=${record.worksheetId}&mode=review" 
-               onclick="sessionStorage.setItem('reviewData', decodeURIComponent('${reviewPayload}'))"
-               class="text-blue-600 underline">Review Answers</a>
-          </td>
-        </tr>
-      `;
-    });
-  }
-  window.onload = loadHistory;
-</script>
+      try {
+        const response = await fetch(`${SCRIPT_URL}?studentId=${studentId}`);
+        const history = await response.json();
+        
+        tableBody.innerHTML = '';
+        if (history.length === 0) {
+          tableBody.innerHTML = '<tr><td colspan="3" class="p-2 text-center text-gray-500">No submissions found.</td></tr>';
+          return;
+        }
+
+        history.forEach(record => {
+          const reviewPayload = encodeURIComponent(JSON.stringify(record.answers));
+          tableBody.innerHTML += `
+            <tr class="hover:bg-gray-50">
+              <td class="p-2 border-b">${record.worksheetId}</td>
+              <td class="p-2 border-b font-semibold">${record.score}%</td>
+              <td class="p-2 border-b">
+                <a href="${record.worksheetId}.html?mode=review" 
+                   onclick="sessionStorage.setItem('reviewData', decodeURIComponent('${reviewPayload}'))"
+                   class="text-blue-600 hover:underline text-sm">Review</a>
+              </td>
+            </tr>
+          `;
+        });
+      } catch (error) {
+        tableBody.innerHTML = '<tr><td colspan="3" class="p-2 text-center text-red-500">Error loading data.</td></tr>';
+      }
+    }
+
+    window.onload = checkAuth;
+  </script>
+</body>
+</html>
