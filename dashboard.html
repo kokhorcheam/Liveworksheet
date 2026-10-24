@@ -1,0 +1,34 @@
+<!-- dashboard.html -->
+<script>
+  const scriptUrl = 'YOUR_APPS_SCRIPT_URL_HERE';
+  const studentId = localStorage.getItem('activeStudentId');
+
+  if (!studentId) window.location.href = 'index.html'; // Kick out if not logged in
+
+  async function loadHistory() {
+    document.getElementById('welcome').innerText = `Welcome, Student ${studentId}`;
+    
+    // Fetch data from Apps Script doGet()
+    const response = await fetch(`${scriptUrl}?studentId=${studentId}`);
+    const history = await response.json();
+    
+    const tableBody = document.getElementById('historyTable');
+    history.forEach(record => {
+      // Store the raw answers temporarily in sessionStorage for the review mode to pick up
+      const reviewPayload = encodeURIComponent(JSON.stringify(record.answers));
+      
+      tableBody.innerHTML += `
+        <tr>
+          <td class="p-2 border">${record.worksheetId}</td>
+          <td class="p-2 border">${record.score}</td>
+          <td class="p-2 border">
+            <a href="worksheet.html?id=${record.worksheetId}&mode=review" 
+               onclick="sessionStorage.setItem('reviewData', decodeURIComponent('${reviewPayload}'))"
+               class="text-blue-600 underline">Review Answers</a>
+          </td>
+        </tr>
+      `;
+    });
+  }
+  window.onload = loadHistory;
+</script>
