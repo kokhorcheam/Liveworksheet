@@ -1,0 +1,16 @@
+<!-- index.html -->
+<script>
+  function login(event) {
+    event.preventDefault();
+    const studentId = document.getElementById('studentId').value;
+    localStorage.setItem('activeStudentId', studentId);
+    window.location.href = 'dashboard.html';
+  }
+</script>
+<div class="font-inter flex items-center justify-center h-screen bg-gray-50">
+  <form onSubmit="login(event)" class="bg-white p-8 rounded shadow-md">
+    <h1 class="text-xl font-bold mb-4">Student Portal Login</h1>
+    <input type="text" id="studentId" placeholder="Enter Student ID" required class="border p-2 w-full mb-4">
+    <button type="submit" class="bg-blue-600 text-white p-2 w-full rounded">Enter</button>
+  </form>
+</div>
