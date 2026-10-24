@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Interactive Module: Job Duties</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style> 
+    .font-inter { font-family: 'Inter', sans-serif; }
+    .font-playfair { font-family: 'Playfair Display', serif; }
+    select, input[type="text"] { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-800 p-8 font-inter">
+  <div class="max-w-4xl mx-auto bg-white p-8 rounded shadow-md">
+    <header class="mb-8 border-b pb-4 flex justify-between items-end">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900" id="worksheetTitle">Week 6: Describing Job Duties</h1>
+        <p class="text-gray-500 text-sm mt-1" id="headerStatus">Active Assignment</p>
+      </div>
+      <a href="dashboard.html" class="text-blue-600 hover:underline text-sm">← Back to Portal</a>
+    </header>
+
+    <form id="worksheetForm" onsubmit="submitWorksheet(event)">
+      
+      <!-- Activity 1: Vocabulary Part 2 -->
+      <div class="mb-8">
+        <h2 class="text-xl font-bold mb-4 text-blue-800">Activity 1: Vocabulary (Paragraph Completion)</h2>
+        <p class="mb-4 text-sm text-gray-600">Select the correct phrase to complete the sentences based on the word banks provided.</p>
+        
+        <div class="bg-gray-50 p-6 rounded mb-6 border border-gray-200">
+          <h3 class="font-semibold mb-2">The Nurse</h3>
+          <p class="font-playfair text-lg leading-relaxed text-gray-700">
+            Every day, the nurse takes care of patients. When a patient is sick, the nurse (1) 
+            <select id="q1" class="border border-gray-300 p-1 rounded text-base" required>
+              <option value="">...</option>
+              <option value="gives medicine">gives medicine</option>
+              <option value="checks vital signs">checks vital signs</option>
+              <option value="cleans wounds">cleans wounds</option>
+              <option value="change bandages">change bandages</option>
+              <option value="records information">records information</option>
+            </select>
+            to help them feel better. She also (2) 
+            <select id="q2" class="border border-gray-300 p-1 rounded text-base" required>
+              <option value="">...</option>
+              <option value="gives medicine">gives medicine</option>
+              <option value="checks vital signs">checks vital signs</option>
+              <option value="cleans wounds">cleans wounds</option>
+              <option value="change bandages">change bandages</option>
+              <option value="records information">records information</option>
+            </select>
+            every morning to see if patients are healthy. If someone cuts their hand, the nurse (3)
+            <select id="q3" class="border border-gray-300 p-1 rounded text-base" required>
+              <option value="">...</option>
+              <option value="gives medicine">gives medicine</option>
+              <option value="checks vital signs">checks vital signs</option>
+              <option value="cleans wounds">cleans wounds</option>
+              <option value="change bandages">change bandages</option>
+              <option value="records information">records information</option>
+            </select>
+            to prevent infection and may need to (4)
+            <select id="q4" class="border border-gray-300 p-1 rounded text-base" required>
+              <option value="">...</option>
+              <option value="gives medicine">gives medicine</option>
+              <option value="checks vital signs">checks vital signs</option>
+              <option value="cleans wounds">cleans wounds</option>
+              <option value="change bandages">change bandages</option>
+              <option value="records information">records information</option>
+            </select>
+            if the bandage is dirty. Finally, she always (5)
+            <select id="q5" class="border border-gray-300 p-1 rounded text-base" required>
+              <option value="">...</option>
+              <option value="gives medicine">gives medicine</option>
+              <option value="checks vital signs">checks vital signs</option>
+              <option value="cleans wounds">cleans wounds</option>
+              <option value="change bandages">change bandages</option>
+              <option value="records information">records information</option>
+            </select>
+            about the patient's health in the chart.
+          </p>
+        </div>
+      </div>
+
+      <!-- Activity 2: Grammar Part 1 -->
+      <div class="mb-8">
+        <h2 class="text-xl font-bold mb-4 text-blue-800">Activity 2: Grammar (Error Correction)</h2>
+        <p class="mb-4 text-sm text-gray-600">Fix the mistake in each sentence. Make sure to use <strong>must + adverb + main verb</strong> without adding -s, -ing, or -ed. Type the full corrected sentence.</p>
+        
+        <div class="mb-4">
+          <label class="block font-semibold mb-1">1. An administrator must organizes files systematically every afternoon.</label>
+          <input type="text" id="q6" placeholder="Type the corrected sentence here..." class="w-full border border-gray-300 p-3 rounded" required>
+        </div>
+
+        <div class="mb-4">
+          <label class="block font-semibold mb-1">2. A dentist must sanitize always dental instruments before treating a patient.</label>
+          <input type="text" id="q7" placeholder="Type the corrected sentence here..." class="w-full border border-gray-300 p-3 rounded" required>
+        </div>
+
+        <div class="mb-4">
+          <label class="block font-semibold mb-1">3. A farmer must waking up early every morning to tend to the crops.</label>
+          <input type="text" id="q8" placeholder="Type the corrected sentence here..." class="w-full border border-gray-300 p-3 rounded" required>
+        </div>
+      </div>
+
+      <button type="submit" id="submitBtn" class="bg-blue-600 text-white px-6 py-3 rounded font-semibold hover:bg-blue-700 w-full transition-colors">Submit Module</button>
+    </form>
+  </div>
+
+  <script>
+    const SCRIPT_URL = 'YOUR_APPS_SCRIPT_WEB_APP_URL'; // Ensure you paste your Apps Script URL here
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get('mode');
+    const worksheetId = 'week6_job_duties';
+    const studentId = localStorage.getItem('activeStudentId');
+
+    // Answer Key mapped from your PDF
+    const answerKey = {
+      "q1": "gives medicine",
+      "q2": "checks vital signs",
+      "q3": "cleans wounds",
+      "q4": "change bandages",
+      "q5": "records information",
+      "q6": "An administrator must organize files systematically every afternoon.",
+      "q7": "A dentist must always sanitize dental instruments before treating a patient.",
+      "q8": "A farmer must wake up early every morning to tend to the crops."
+    };
+
+    window.onload = function() {
+      if (!studentId) window.location.href = 'dashboard.html';
+      
+      if (mode === 'review') {
+        enableReviewMode();
+      }
+    };
+
+    function enableReviewMode() {
+      document.getElementById('submitBtn').style.display = 'none';
+      document.getElementById('headerStatus').innerText = "Review Mode (Read Only)";
+      document.getElementById('headerStatus').classList.add('text-orange-600', 'font-semibold');
+      
+      const savedAnswers = JSON.parse(sessionStorage.getItem('reviewData') || '{}');
+      
+      for (const [inputId, answerValue] of Object.entries(savedAnswers)) {
+        const inputElement = document.getElementById(inputId);
+        if (inputElement) {
+          inputElement.value = answerValue;
+          inputElement.disabled = true;
+          
+          // Clean strings for grading comparison (ignore case and extra spaces)
+          const cleanAnswer = answerValue.toLowerCase().trim().replace(/\.$/, "");
+          const cleanKey = answerKey[inputId].toLowerCase().trim().replace(/\.$/, "");
+          
+          const isCorrect = cleanAnswer === cleanKey;
+          if (isCorrect) {
+            inputElement.classList.add('bg-green-50', 'border-green-400', 'text-green-800');
+          } else {
+            inputElement.classList.add('bg-red-50', 'border-red-400', 'text-red-800');
+          }
+        }
+      }
+    }
+
+    async function submitWorksheet(event) {
+      event.preventDefault();
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.innerText = "Submitting...";
+      submitBtn.disabled = true;
+
+      const gatheredAnswers = {
+        "q1": document.getElementById('q1').value,
+        "q2": document.getElementById('q2').value,
+        "q3": document.getElementById('q3').value,
+        "q4": document.getElementById('q4').value,
+        "q5": document.getElementById('q5').value,
+        "q6": document.getElementById('q6').value,
+        "q7": document.getElementById('q7').value,
+        "q8": document.getElementById('q8').value
+      };
+
+      let correctCount = 0;
+      const totalQuestions = Object.keys(answerKey).length;
+
+      for (const [key, value] of Object.entries(gatheredAnswers)) {
+         const cleanAnswer = value.toLowerCase().trim().replace(/\.$/, "");
+         const cleanKey = answerKey[key].toLowerCase().trim().replace(/\.$/, "");
+         if (cleanAnswer === cleanKey) correctCount++;
+      }
+      
+      const calculatedScore = Math.round((correctCount / totalQuestions) * 100);
+
+      const payload = {
+        studentId: studentId,
+        worksheetId: worksheetId,
+        score: calculatedScore,
+        answers: gatheredAnswers 
+      };
+
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify(payload)
+        });
+        alert(`Submitted successfully! Your score: ${calculatedScore}%`);
+        window.location.href = 'dashboard.html';
+      } catch (error) {
+        alert("Error submitting. Please try again.");
+        submitBtn.innerText = "Submit Module";
+        submitBtn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
